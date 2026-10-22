@@ -1,6 +1,21 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { IExpense } from "../types";
 
-export useExpenseStore = create() (
-    persist ((set) => ({}), {name: 'expenses'})
+interface IExpenseStore {
+    expenses: IExpense[],
+    addExpense: (data: IExpense) => void,
+    removeExpense: (id: string) => void
+
+}
+
+export const useExpenseStore = create<IExpenseStore>() (
+    persist ((set) => ({
+        expenses: [],
+        addExpense: (data) => set(v => ({expenses: [...v.expenses, data]})),
+        removeExpense: (id) => set(v => ({expenses: v.expenses.filter(e => e.id !== id)
+
+         })),
+    }), {name: "expenses", storage: createJSONStorage(() => localStorage)},
+    ),
 )
